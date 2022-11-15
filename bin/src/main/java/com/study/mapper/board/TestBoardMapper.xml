@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.study.mapper.board.TestBoardMapper">
+
+	<select id="countAll" resultType="int">
+		SELECT COUNT(*)
+		FROM testBoard	
+	</select>
+
+
+	<insert id="insert">
+	  	INSERT testBoard(title, content, writer)
+	  	VALUES (#{title}, #{content}, #{writer})
+	</insert>
+	
+	<select id="list" resultType="com.study.domain.board.TestBoardDto">
+		SELECT id, title, writer, inserted
+		FROM testBoard 
+		ORDER BY id DESC
+		LIMIT #{offset},${records}
+	</select>
+	
+	<select id="select" resultType="com.study.domain.board.TestBoardDto">
+	 	SELECT id, title,content, writer, inserted
+	 	FROM testBoard
+	 	WHERE id = #{id}
+	</select>
+	
+	<update id="update">
+		UPDATE testBoard
+		SET 
+			title = #{title},
+			content = #{content}
+		WHERE
+			id = #{id}	
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM testBoard
+		WHERE id = #{id}
+	</delete>
+	
+</mapper>
