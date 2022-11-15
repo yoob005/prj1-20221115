@@ -20,6 +20,7 @@
 				<h1>회원가입</h1>
 				
 				<form action="" method="post">
+				<!-- 아이디 -->
 					<div class="mb-3">
 						<label for="" class="form-label">
 							아이디
@@ -31,6 +32,20 @@
 						</div>
 						
 						<div id="userIdText1" class="form-text">아이디 중복확인을 해주세요.</div>
+						
+					</div>
+				<!-- 닉네임 -->
+					<div class="mb-3">
+						<label for="" class="form-label">
+							닉네임
+						</label>
+						
+						<div class="input-group">
+							<input id="nickNameInput1" class="form-control" type="text" name="nickName">
+							<button id="nickNameExistButton1" class="btn btn-outline-secondary" type="button">중복확인</button>
+						</div>
+						
+						<div id="nickNameText1" class="form-text">닉네임 중복확인을 해주세요.</div>
 						
 					</div>
 
@@ -74,6 +89,8 @@
 const ctx = "${pageContext.request.contextPath}";
 // 아이디 사용 가능
 let availableId = false;
+// 닉네임 사용 가능
+let availableNickName = false;
 // 이메일 사용 가능
 let availableEmail = false;
 // 패스워드 사용 가능
@@ -91,6 +108,12 @@ function enableSubmitButton() {
 //id input 변경시 submit 버튼 비활성화
 document.querySelector("#userIdInput1").addEventListener("keyup", function() {
 	availableId = false;
+	enableSubmitButton();
+});
+
+//nickName input 변경시 submit 버튼 비활성화
+document.querySelector("#nickNameInput1").addEventListener("keyup", function() {
+	availableNickName = false;
 	enableSubmitButton();
 });
 
@@ -139,6 +162,27 @@ document.querySelector("#userIdExistButton1").addEventListener("click", function
 			
 			if (data.status == "not exist") {
 				availableId = true;
+				enableSubmitButton();
+			}
+		}); 
+	
+});
+
+//닉네임 중복확인
+document.querySelector("#nickNameExistButton1").addEventListener("click", function() {
+	availableNickName = false;
+	// 입력된 닉네임을
+	const nickName = document.querySelector("#nickNameInput1").value;
+	
+	// fetch 요청 보내고
+	fetch(ctx + "/member/existNickName/" + nickName)
+		.then(res => res.json())
+		.then(data => {
+			// 응답 받아서 메세지 출력
+			document.querySelector("#nickNameText1").innerText = data.message;
+			
+			if (data.status == "not exist") {
+				availableNickName = true;
 				enableSubmitButton();
 			}
 		}); 

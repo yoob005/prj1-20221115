@@ -31,7 +31,7 @@ public class MemberService {
 		int cnt = 0;
 		
 		try {
-			mapper.updateMember(member);
+			return mapper.updateMember(member);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -47,6 +47,10 @@ public class MemberService {
 
 	public MemberDto getEmail(String email) {
 		return mapper.selectByEmail(email);
+	}
+	
+	public MemberDto getNickName(String nickName) {
+		return mapper.selectByNickName(nickName);
 	}
 	
 }

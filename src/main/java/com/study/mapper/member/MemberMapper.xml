@@ -5,8 +5,14 @@
   
 <mapper namespace="com.study.mapper.member.MemberMapper">
 
+	<select id="selectByNickName" resultType="com.study.domain.member.MemberDto">
+		SELECT id, nickName, password, email, inserted
+		FROM Member
+		WHERE nickName = #{nickName}
+	</select>
+
 	<select id="selectByEmail" resultType="com.study.domain.member.MemberDto">
-		SELECT id, password, email, inserted
+		SELECT id, nickName, password, email, inserted
 		FROM Member
 		WHERE email = #{email}
 	</select>
@@ -20,25 +26,26 @@
 	<update id="updateMember">
 	UPDATE Member
 	SET
+		nickName = #{nickName},
 		password = #{password}, 
 		email = #{email}
 	WHERE id = #{id}	
 	</update>
 	
 	<select id="selectMember" resultType="com.study.domain.member.MemberDto">
-		SELECT id, password, email, inserted
+		SELECT id, nickName, password, email, inserted
 		FROM Member
 		WHERE id = #{id}
 	</select>
 	
 	
 	<insert id="insert">
-		INSERT INTO Member (id, password, email)
-		VALUES (#{id}, #{password}, #{email})
+		INSERT INTO Member (id, nickName, password, email)
+		VALUES (#{id}, #{nickName}, #{password}, #{email})
 	</insert>
 	
 	<select id="selectAll" resultType="com.study.domain.member.MemberDto">
-		SELECT id, password, email, inserted
+		SELECT id, nickName, password, email, inserted
 		FROM Member
 		ORDER BY id
 	</select>
