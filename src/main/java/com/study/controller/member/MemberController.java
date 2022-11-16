@@ -23,6 +23,11 @@ public class MemberController {
 	@Autowired
 	private MemberService service;
 	
+	@GetMapping("login")
+	public void login() {
+		
+	}
+	
 	@PostMapping("existEmail")
 	@ResponseBody
 	public Map<String, Object> existEmail(@RequestBody Map<String, String> req){
