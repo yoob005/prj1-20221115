@@ -1,7 +1,9 @@
 package com.study.service.board;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,10 +109,6 @@ public class BoardService {
 		return boardMapper.list(offset, records, type, "%" + keyword + "%");
 	}
 
-	public BoardDto get(int id) {
-		// TODO Auto-generated method stub
-		return boardMapper.select(id);
-	}
 
 	public int update(BoardDto board, MultipartFile[] addFiles, List<String> removeFiles) {
 		int boardId = board.getId();
@@ -158,6 +156,8 @@ public class BoardService {
 			}
 		}
 		
+		// 좋아요 파일 지우기
+		boardMapper.deleteLikeByBoardId(id);
 		
 		// db 파일 records 지우기
 		boardMapper.deleteFileByBoardId(id);
@@ -180,7 +180,38 @@ public class BoardService {
 				.build();
 		s3Client.deleteObject(deleteObjectRequest);
 	}
+
+	public Map<String, Object> updateLike(String boardId, String memberId) {
+		Map<String, Object> map = new HashMap<>();
+		
+		int cnt = boardMapper.getLikeByBoardIdAndMemberId(boardId, memberId);
+		//boardId 와 username으로 좋아요 테이블 검색해서 있으면
+		
+		if(cnt==1) {
+			boardMapper.deleteLike(boardId, memberId);
+			map.put("current", "not liked");
+		} else {
+			//없으면?
+			// insert
+			boardMapper.insertLike(boardId, memberId);
+			map.put("current", "liked");
+			
+			
+		}
+		int countAll = boardMapper.countLikeByBoardId(boardId);
+		//현재 몇개인지
+		map.put("count", countAll);
+		
+		return map;
+	}
+
+	public BoardDto get(int id) {
+		return get(id , null);
+	}
 	
+	public BoardDto get(int id, String username) {
+		return boardMapper.select(id, username);
+	}
 }
 
 

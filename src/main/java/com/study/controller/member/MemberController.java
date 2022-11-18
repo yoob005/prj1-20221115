@@ -3,7 +3,12 @@ package com.study.controller.member;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +27,9 @@ public class MemberController {
 	
 	@Autowired
 	private MemberService service;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@GetMapping("login")
 	public void login() {
@@ -45,13 +53,12 @@ public class MemberController {
 		return map;
 	}
 	
-	@PostMapping("existNickName")
+	@GetMapping("existNickName/{nickName}")
 	@ResponseBody
-	public Map<String, Object> existNickName(@RequestBody Map<String, String> req){
-		
-		Map<String,Object> map = new HashMap<>();
-		
-		MemberDto member = service.getNickName(req.get("nickName"));
+	public Map<String, Object> existNickName(@PathVariable String nickName) {
+		Map<String, Object> map = new HashMap<>();
+
+		MemberDto member = service.getNickName(nickName);
 		
 		if(member==null) {
 			map.put("status", "not exist");
@@ -107,12 +114,14 @@ public class MemberController {
 	}
 	
 	@GetMapping("list")
+	@PreAuthorize("hasAuthority('admin')")
 	public void list(Model model) {
 		model.addAttribute("memberList", service.list());
 //		Model.addAttribute("memberList",service.list());
 	}
 	
-	@GetMapping("get")
+	@GetMapping({"get","modify"})
+	@PreAuthorize("(authentication.name == #id) or (hasAuthority('admin')) ")
 	public void get(String id, Model model) {
 		
 		MemberDto member = service.get(id);
@@ -120,20 +129,17 @@ public class MemberController {
 		model.addAttribute("member", member);
 	}
 	
-	@GetMapping("modify")
-	public void modify(String id, Model model) {
-		
-		MemberDto member = service.get(id);
-		
-		model.addAttribute("member", member);
-	}
 	
 	@PostMapping("modify")
+	@PreAuthorize("authentication.name == #member.id")
 	public String modify(MemberDto member, String oldPassword, RedirectAttributes rttr) {
 		MemberDto oldmember = service.get(member.getId());
 		
 		rttr.addAttribute("id", member.getId());
-		if (oldmember.getPassword().equals(oldPassword)) {
+		
+		boolean passwordMatch = passwordEncoder.matches(oldPassword, oldmember.getPassword());
+		
+		if (passwordMatch) {
 			// 기존 암호가 맞으면 회원 정보 수정
 			int cnt = service.update(member);
 			
@@ -150,14 +156,18 @@ public class MemberController {
 		}
 	}
 	@PostMapping("remove")
-	public String remove(String id, String oldPassword, RedirectAttributes rttr) {
+	public String remove(String id, String oldPassword, RedirectAttributes rttr, HttpServletRequest request) throws Exception {
 		MemberDto oldmember = service.get(id);
-		if (oldmember.getPassword().equals(oldPassword)) {
+		
+		boolean passwordMatch = passwordEncoder.matches(oldPassword, oldmember.getPassword());
+		
+		if (passwordMatch) {
 			
-			int cnt = service.remove(id);
+			service.remove(id);
 			
 			rttr.addFlashAttribute("message", "회원 탈퇴하였습니다.");
-
+			request.logout();
+			
 			return "redirect:/member/list";
 
 		} else {

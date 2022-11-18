@@ -53,7 +53,7 @@
 						<label for="" class="form-label">
 							암호
 						</label>
-						<input id="passwordInput1" class="form-control" type="text" name="password">
+						<input id="passwordInput1" class="form-control" type="password" name="password">
 						<div id="passwordText1" class="form-text"></div>
 					</div>
 					
@@ -61,7 +61,7 @@
 						<label for="" class="form-label">
 							암호 확인
 						</label>
-						<input id="passwordInput2" class="form-control" type="text">
+						<input id="passwordInput2" class="form-control" type="password">
 					</div>
 
 					<div class="mb-3">

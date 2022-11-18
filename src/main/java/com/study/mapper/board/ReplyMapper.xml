@@ -5,6 +5,10 @@
   
 <mapper namespace="com.study.mapper.board.ReplyMapper">
 	
+	<delete id="deleteByMemeberId">
+	DELETE FROM Reply
+	WHERE writer = #{id}
+	</delete>
 
 	<delete id="deleteByBoardId">
 	DELETE FROM Reply
@@ -24,6 +28,7 @@
 		id,
 		boardId,
 		content,
+		writer,
 		inserted
 	FROM
 		Reply
@@ -42,6 +47,8 @@
 		id,
 		boardId,
 		content,
+		writer,
+		(writer = #{username}) editable,
 		inserted
 	FROM
 		Reply
@@ -51,8 +58,8 @@
 		id DESC
 	</select>
 
-	<insert id="insert">
-	INSERT INTO Reply (boardId, content)
-	VALUES (#{boardId}, #{content})
+	<insert id="insert" >
+	INSERT INTO Reply (boardId, content, writer)
+	VALUES (#{boardId}, #{content}, #{writer})
 	</insert>
 </mapper>
